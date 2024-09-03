@@ -1,0 +1,19 @@
+.DS_Store
+node_modules/
+.vscode/
+
+# OS generated files
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE files
+*.swp
+*.swo
+.idea/
+*.sublime-workspace
+
+# End of line normalization
+* text=auto

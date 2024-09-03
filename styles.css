@@ -1,0 +1,95 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    color: white;
+    background-color: #000;
+    overflow-x: hidden;
+}
+
+.scroll-container {
+    height: 1000vh; /* Adjust this value to control scroll length */
+    position: relative;
+    width: 100vw;
+}
+
+.sequence-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#sequence {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    object-position: center;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-height: 40px; /* Adjust as needed */
+}
+
+.page-title {
+    font-size: 42px;
+    margin: 0;
+}
+
+.hire-button {
+    background-color: #ff00ff; /* Adjust color as needed */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+nav {
+    margin-top: 20px; /* Add space between header-top and nav */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+nav ul li {
+    font-size: 14px;
+    margin-bottom: 10px; /* Add space between nav items */
+}
+
+nav ul li:last-child {
+    margin-bottom: 0; /* Remove margin from the last item */
+}
