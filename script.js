@@ -6,7 +6,7 @@ const totalFrames = 120;
 const triggerFrame = 35;
 const fps = 120; // Frames per second from Blender export
 const duration = totalFrames / fps; // Duration of the animation in seconds
-const imagePrefix = 'images/';
+const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
 const imageExtension = '.png';
 
 const imagePaths = Array.from({ length: totalFrames }, (_, i) => 
