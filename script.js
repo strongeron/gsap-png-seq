@@ -40,15 +40,39 @@ const sequenceTl = gsap.timeline({
     }
 });
 
-// Animate the frame number
+// Add this near the top of your file
+let lastTime = 0;
+let frameCount = 0;
+const fpsElement = document.getElementById('fps-counter');
+
+// Add this function
+function updateFPS(currentTime) {
+    frameCount++;
+    const deltaTime = currentTime - lastTime;
+    
+    if (deltaTime >= 1000) {
+        const fps = Math.round((frameCount * 1000) / deltaTime);
+        fpsElement.textContent = `FPS: ${fps}`;
+        frameCount = 0;
+        lastTime = currentTime;
+    }
+    
+    requestAnimationFrame(updateFPS);
+}
+
+// Start the FPS counter
+requestAnimationFrame(updateFPS);
+
+// Modify your existing animation code to update more frequently
 sequenceTl.to({}, {
     duration: duration,
     onUpdate: function() {
         const progress = this.progress();
         const frameIndex = Math.round(progress * (totalFrames - 1));
         document.getElementById('sequence').src = imagePaths[frameIndex];
-        console.log("Frame:", frameIndex);
-    }
+    },
+    onUpdateParams: ["{self}"],
+    ease: "none"
 });
 
 // Create a separate ScrollTrigger for header elements
