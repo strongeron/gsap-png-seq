@@ -2,10 +2,10 @@ console.log("Script started");
 
 gsap.registerPlugin(ScrollTrigger);
 
-const totalFrames = 30;
+const totalFrames = 31; // 0000 to 0030
 const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
 let currentFormat = 'webp-combined';
-let highQualityFrames = [];
+let frameQuality = [];
 
 const getImagePath = (frameIndex) => {
     const paddedIndex = frameIndex.toString().padStart(4, '0');
@@ -15,36 +15,52 @@ const getImagePath = (frameIndex) => {
         case 'webp':
             return `${imagePrefix}webp/${paddedIndex}.webp`;
         case 'webp-combined':
-            const quality = highQualityFrames.includes(frameIndex) ? 'high' : 'low';
+            const quality = frameQuality[frameIndex] || 'low';
             return `${imagePrefix}webp-combined/${quality}/${paddedIndex}.webp`;
         default:
-            return `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
+            return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
     }
 };
 
-const determineHighQualityFrames = async () => {
-    highQualityFrames = [];
+const determineFrameQualities = async () => {
+    frameQuality = [];
     for (let i = 0; i < totalFrames; i++) {
         const paddedIndex = i.toString().padStart(4, '0');
         const highQualityPath = `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
+        const lowQualityPath = `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
+        
         try {
-            const response = await fetch(highQualityPath, { method: 'HEAD' });
-            if (response.ok) {
-                highQualityFrames.push(i);
+            const highResponse = await fetch(highQualityPath, { method: 'HEAD' });
+            if (highResponse.ok) {
+                frameQuality[i] = 'high';
+                continue;
             }
         } catch (error) {
-            console.log(`Frame ${i} not found in high quality`);
+            console.log(`High quality frame ${i} not found, checking low quality`);
+        }
+        
+        try {
+            const lowResponse = await fetch(lowQualityPath, { method: 'HEAD' });
+            if (lowResponse.ok) {
+                frameQuality[i] = 'low';
+            } else {
+                console.log(`Frame ${i} not found in either quality`);
+            }
+        } catch (error) {
+            console.log(`Frame ${i} not found in either quality`);
         }
     }
-    console.log("High quality frames:", highQualityFrames);
+    console.log("Frame qualities:", frameQuality);
 };
 
 const preloadImages = () => {
     console.log("Preloading images for format:", currentFormat);
     for (let i = 0; i < totalFrames; i++) {
-        const img = new Image();
-        img.src = getImagePath(i);
-        console.log("Preloading:", img.src);
+        if (frameQuality[i]) {
+            const img = new Image();
+            img.src = getImagePath(i);
+            console.log("Preloading:", img.src);
+        }
     }
 };
 
@@ -58,13 +74,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    await determineHighQualityFrames();
+    await determineFrameQualities();
 
     function updateFrame(frameIndex) {
-        const imagePath = getImagePath(frameIndex);
-        console.log("Updating frame:", frameIndex, "Image path:", imagePath);
-        sequenceImg.src = imagePath;
-        frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
+        if (frameQuality[frameIndex]) {
+            const imagePath = getImagePath(frameIndex);
+            console.log("Updating frame:", frameIndex, "Image path:", imagePath);
+            sequenceImg.src = imagePath;
+            frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
+        } else {
+            console.log("Frame not available:", frameIndex);
+        }
     }
 
     function changeFormat(format) {
@@ -72,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentFormat = format;
         preloadImages();
         const progress = sequenceTl.progress();
-        const frameIndex = Math.floor(progress * totalFrames);
+        const frameIndex = Math.floor(progress * (totalFrames - 1));
         updateFrame(frameIndex);
     }
 
@@ -87,10 +107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     sequenceTl.to({}, {
-        duration: totalFrames,
+        duration: totalFrames - 1,
         onUpdate: function() {
             const progress = this.progress();
-            const frameIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
+            const frameIndex = Math.min(Math.floor(progress * (totalFrames - 1)), totalFrames - 1);
             updateFrame(frameIndex);
         }
     });
