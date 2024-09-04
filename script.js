@@ -7,16 +7,17 @@ const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
 let currentFormat = 'webp-combined'; // Default format
 
 const getImagePath = (frameIndex) => {
+    const paddedIndex = (frameIndex).toString().padStart(4, '0');
     switch (currentFormat) {
         case 'png':
-            return `${imagePrefix}png/${frameIndex.toString().padStart(4, '0')}.png`;
+            return `${imagePrefix}png/${paddedIndex}.png`;
         case 'webp':
-            return `${imagePrefix}webp/${frameIndex.toString().padStart(4, '0')}.webp`;
+            return `${imagePrefix}webp/${paddedIndex}.webp`;
         case 'webp-combined':
-            const quality = frameIndex < 18 ? 'high' : 'low';
-            return `${imagePrefix}webp-combined/${quality}/${frameIndex.toString().padStart(4, '0')}.webp`;
+            const quality = frameIndex <= 18 ? 'high' : 'low';
+            return `${imagePrefix}webp-combined/${quality}/${paddedIndex}.webp`;
         default:
-            return `${imagePrefix}webp-combined/high/${frameIndex.toString().padStart(4, '0')}.webp`;
+            return `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
     }
 };
 
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateFrame(frameIndex) {
-        const imagePath = getImagePath(frameIndex + 1); // Add 1 to match file naming
+        const imagePath = getImagePath(frameIndex + 1); // Add 1 to match file naming (1-based)
         console.log("Updating frame:", frameIndex + 1, "Image path:", imagePath);
         sequenceImg.src = imagePath;
         frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
