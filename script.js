@@ -21,9 +21,11 @@ const getImagePath = (frameIndex) => {
 };
 
 const preloadImages = () => {
+    console.log("Preloading images for format:", currentFormat);
     for (let i = 0; i < totalFrames; i++) {
         const img = new Image();
         img.src = getImagePath(i);
+        console.log("Preloading:", img.src);
     }
 };
 
@@ -33,11 +35,12 @@ gsap.set("#additional-elements", { opacity: 0, y: -50 });
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Get the frame counter element
-    const frameCounter = document.getElementById('frame-counter');
     const sequenceImg = document.getElementById('sequence');
+    const frameCounter = document.getElementById('frame-counter');
+    const formatSelector = document.getElementById('image-format');
 
-    if (!frameCounter || !sequenceImg) {
-        console.error('Frame counter or sequence image element not found');
+    if (!sequenceImg || !frameCounter || !formatSelector) {
+        console.error('Required elements not found');
         return;
     }
 
@@ -55,8 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Animate the frame number
     sequenceTl.to({}, {
-        duration: totalFrames / 30, // Assuming 30 fps
-        ease: "none",
+        duration: totalFrames, // Assuming 30 fps
         onUpdate: function() {
             const progress = this.progress();
             const frameIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
@@ -102,13 +104,16 @@ const changeFormat = (format) => {
 };
 
 function updateFrame(frameIndex) {
-    sequenceImg.src = getImagePath(frameIndex);
+    const imagePath = getImagePath(frameIndex);
+    console.log("Updating frame:", frameIndex, "Image path:", imagePath);
+    sequenceImg.src = imagePath;
     frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
     console.log("Frame:", frameIndex + 1);
 }
 
 // Add event listener for format selector
 document.getElementById('image-format').addEventListener('change', (e) => {
+    console.log("Format changed to:", e.target.value);
     changeFormat(e.target.value);
 });
 
