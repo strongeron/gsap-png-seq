@@ -46,47 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
             trigger: ".scroll-container",
             start: "top top",
             end: "bottom bottom",
-            scrub: 2, // Increased for smoother scrolling
+            scrub: 0.5, // Adjusted for smoother scrolling
             markers: true,
-            ease: "power2.inOut" // Smooth easing function
+            ease: "none", // Linear animation for consistent frame rate
         }
     });
 
-    // Animate the frame number with interpolation
-    sequenceTl.to({frame: 0}, {
-        frame: totalFrames - 1,
+    // Animate the frame number
+    sequenceTl.to({}, {
         duration: duration,
         ease: "none",
         onUpdate: function() {
-            const frame = this.targets()[0].frame;
-            const frameIndex = Math.floor(frame);
-            const nextFrameIndex = (frameIndex + 1) % totalFrames;
-            const frameFraction = frame - frameIndex;
-
-            // Crossfade between current and next frame
-            sequenceImg.style.opacity = 1 - frameFraction;
+            const progress = this.progress();
+            const frameIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
             sequenceImg.src = imagePaths[frameIndex];
-
-            // Prepare next frame
-            const nextImg = new Image();
-            nextImg.src = imagePaths[nextFrameIndex];
-            nextImg.style.position = 'absolute';
-            nextImg.style.top = '0';
-            nextImg.style.left = '0';
-            nextImg.style.width = '100%';
-            nextImg.style.height = '100%';
-            nextImg.style.opacity = frameFraction;
-
-            sequenceImg.parentNode.appendChild(nextImg);
-
-            // Remove previous "next frame" if exists
-            const oldNextFrame = sequenceImg.parentNode.querySelector('img:not(#sequence)');
-            if (oldNextFrame && oldNextFrame !== nextImg) {
-                oldNextFrame.remove();
-            }
-
-            frameCounter.textContent = `Frame: ${(frameIndex + 1).toFixed(2)} / ${totalFrames}`;
-            console.log("Frame:", (frameIndex + 1).toFixed(2));
+            frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
+            console.log("Frame:", frameIndex + 1);
         }
     });
 
@@ -113,6 +88,6 @@ function animateHeaderElements(show) {
         opacity: show ? 1 : 0,
         y: show ? 0 : -50,
         duration: duration,
-        ease: "power2.inOut"
+        ease: "power2.inOut" // Smooth easing for header animation
     });
 }
