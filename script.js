@@ -2,9 +2,9 @@ console.log("Script started");
 
 gsap.registerPlugin(ScrollTrigger);
 
-const totalFrames = 30; // Updated to 30 frames
+const totalFrames = 30;
 const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
-let currentFormat = 'webp-combined'; // Default format
+let currentFormat = 'webp-combined';
 
 const getImagePath = (frameIndex) => {
     const paddedIndex = frameIndex.toString().padStart(4, '0');
@@ -30,10 +30,6 @@ const preloadImages = () => {
     }
 };
 
-// Hide header elements by default
-gsap.set("#additional-elements", { opacity: 0, y: -50 });
-
-// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     const sequenceImg = document.getElementById('sequence');
     const frameCounter = document.getElementById('frame-counter');
@@ -65,14 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
             trigger: ".scroll-container",
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5, // Adjusted for smoother scrolling
+            scrub: 0.5,
             markers: true,
-            ease: "none", // Linear animation for consistent frame rate
         }
     });
 
     sequenceTl.to({}, {
-        duration: totalFrames, // Assuming 30 fps
+        duration: totalFrames,
         onUpdate: function() {
             const progress = this.progress();
             const frameIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
@@ -80,36 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Create a separate ScrollTrigger for header elements
-    ScrollTrigger.create({
-        trigger: ".scroll-container",
-        start: "top+=35% top",
-        end: "bottom bottom",
-        markers: true,
-        onEnter: () => animateHeaderElements(true),
-        onLeaveBack: () => animateHeaderElements(false)
-    });
-
     formatSelector.addEventListener('change', (e) => {
         changeFormat(e.target.value);
     });
 
-    console.log("Animation setup complete");
+    // Set initial frame
+    updateFrame(0);
+
+    preloadImages();
 });
 
-function animateHeaderElements(show) {
-    const header = document.querySelector('#additional-elements');
-    const duration = 0.5;
-
-    console.log(`Animating header elements: ${show ? 'show' : 'hide'}`);
-
-    gsap.to(header, {
-        opacity: show ? 1 : 0,
-        y: show ? 0 : -50,
-        duration: duration,
-        ease: "power2.inOut" // Smooth easing for header animation
-    });
-}
-
-// Initial preload
-preloadImages();
+console.log("Script loaded");
