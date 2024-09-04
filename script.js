@@ -34,7 +34,6 @@ gsap.set("#additional-elements", { opacity: 0, y: -50 });
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Get the frame counter element
     const sequenceImg = document.getElementById('sequence');
     const frameCounter = document.getElementById('frame-counter');
     const formatSelector = document.getElementById('image-format');
@@ -44,7 +43,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Create a GSAP timeline for image sequence animation
+    function updateFrame(frameIndex) {
+        const imagePath = getImagePath(frameIndex);
+        console.log("Updating frame:", frameIndex, "Image path:", imagePath);
+        sequenceImg.src = imagePath;
+        frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
+    }
+
+    function changeFormat(format) {
+        console.log("Changing format to:", format);
+        currentFormat = format;
+        preloadImages();
+        const progress = sequenceTl.progress();
+        const frameIndex = Math.floor(progress * totalFrames);
+        updateFrame(frameIndex);
+    }
+
     const sequenceTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".scroll-container",
@@ -56,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Animate the frame number
     sequenceTl.to({}, {
         duration: totalFrames, // Assuming 30 fps
         onUpdate: function() {
@@ -76,6 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
         onLeaveBack: () => animateHeaderElements(false)
     });
 
+    formatSelector.addEventListener('change', (e) => {
+        changeFormat(e.target.value);
+    });
+
     console.log("Animation setup complete");
 });
 
@@ -92,30 +109,6 @@ function animateHeaderElements(show) {
         ease: "power2.inOut" // Smooth easing for header animation
     });
 }
-
-// Add this function to handle format changes
-const changeFormat = (format) => {
-    currentFormat = format;
-    preloadImages();
-    // Reset animation or update current frame
-    const progress = sequenceTl.progress();
-    const frameIndex = Math.floor(progress * totalFrames);
-    updateFrame(frameIndex);
-};
-
-function updateFrame(frameIndex) {
-    const imagePath = getImagePath(frameIndex);
-    console.log("Updating frame:", frameIndex, "Image path:", imagePath);
-    sequenceImg.src = imagePath;
-    frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
-    console.log("Frame:", frameIndex + 1);
-}
-
-// Add event listener for format selector
-document.getElementById('image-format').addEventListener('change', (e) => {
-    console.log("Format changed to:", e.target.value);
-    changeFormat(e.target.value);
-});
 
 // Initial preload
 preloadImages();
