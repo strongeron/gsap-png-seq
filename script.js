@@ -9,14 +9,14 @@ let currentFormat = 'webp-combined'; // Default format
 const getImagePath = (frameIndex) => {
     switch (currentFormat) {
         case 'png':
-            return `${imagePrefix}png/${(frameIndex + 1).toString().padStart(4, '0')}.png`;
+            return `${imagePrefix}png/${frameIndex.toString().padStart(4, '0')}.png`;
         case 'webp':
-            return `${imagePrefix}webp/${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+            return `${imagePrefix}webp/${frameIndex.toString().padStart(4, '0')}.webp`;
         case 'webp-combined':
             const quality = frameIndex < 18 ? 'high' : 'low';
-            return `${imagePrefix}webp-combined/${quality}_${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+            return `${imagePrefix}webp-combined/${quality}/${frameIndex.toString().padStart(4, '0')}.webp`;
         default:
-            return `${imagePrefix}webp-combined/high_${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+            return `${imagePrefix}webp-combined/high/${frameIndex.toString().padStart(4, '0')}.webp`;
     }
 };
 
@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateFrame(frameIndex) {
-        const imagePath = getImagePath(frameIndex);
-        console.log("Updating frame:", frameIndex, "Image path:", imagePath);
+        const imagePath = getImagePath(frameIndex + 1); // Add 1 to match file naming
+        console.log("Updating frame:", frameIndex + 1, "Image path:", imagePath);
         sequenceImg.src = imagePath;
         frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
     }
