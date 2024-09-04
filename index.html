@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="format-selector">
+        <label for="image-format">Select Format:</label>
+        <select id="image-format">
+            <option value="png">PNG</option>
+            <option value="webp">WebP</option>
+            <option value="webp-combined">WebP Combined</option>
+        </select>
+    </div>
+
     <div class="scroll-container">
         <div class="sequence-wrapper">
             <img id="sequence" src="images/0001.png" alt="3D Rotation Sequence">
@@ -35,10 +44,10 @@
         </header>
     </div>
 
+    <div id="frame-counter" style="position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px; font-family: Arial, sans-serif;">Frame: 0 / 30</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
-
-    <div id="frame-counter" style="position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px; font-family: Arial, sans-serif;">Frame: 0 / 30</div>
 </body>
 </html>

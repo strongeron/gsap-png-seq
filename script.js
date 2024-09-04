@@ -3,28 +3,29 @@ console.log("Script started");
 gsap.registerPlugin(ScrollTrigger);
 
 const totalFrames = 30; // Updated to 30 frames
-const triggerFrame = 10; // Adjusted for 30 frames, you can fine-tune this
-const fps = 30; // Adjusted for 30 frames
-const duration = totalFrames / fps; // Duration of the animation in seconds
 const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
-const imageExtension = '.webp'; // Changed to .webp
+let currentFormat = 'webp-combined'; // Default format
 
-const imagePaths = Array.from({ length: totalFrames }, (_, i) => 
-    `${imagePrefix}${(i + 1).toString().padStart(4, '0')}${imageExtension}`
-);
-
-console.log("Image paths created:", imagePaths[0], "...", imagePaths[imagePaths.length - 1]);
-
-// Preload images
-const preloadImages = () => {
-    imagePaths.forEach(path => {
-        const img = new Image();
-        img.src = path;
-    });
+const getImagePath = (frameIndex) => {
+    switch (currentFormat) {
+        case 'png':
+            return `${imagePrefix}png/${(frameIndex + 1).toString().padStart(4, '0')}.png`;
+        case 'webp':
+            return `${imagePrefix}webp/${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+        case 'webp-combined':
+            const quality = frameIndex < 18 ? 'high' : 'low';
+            return `${imagePrefix}webp-combined/${quality}_${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+        default:
+            return `${imagePrefix}webp-combined/high_${(frameIndex + 1).toString().padStart(4, '0')}.webp`;
+    }
 };
 
-preloadImages();
-console.log("Images preloaded");
+const preloadImages = () => {
+    for (let i = 0; i < totalFrames; i++) {
+        const img = new Image();
+        img.src = getImagePath(i);
+    }
+};
 
 // Hide header elements by default
 gsap.set("#additional-elements", { opacity: 0, y: -50 });
@@ -54,21 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Animate the frame number
     sequenceTl.to({}, {
-        duration: duration,
+        duration: totalFrames / 30, // Assuming 30 fps
         ease: "none",
         onUpdate: function() {
             const progress = this.progress();
             const frameIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
-            sequenceImg.src = imagePaths[frameIndex];
-            frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
-            console.log("Frame:", frameIndex + 1);
+            updateFrame(frameIndex);
         }
     });
 
     // Create a separate ScrollTrigger for header elements
     ScrollTrigger.create({
         trigger: ".scroll-container",
-        start: `top+=${triggerFrame / totalFrames * 100}% top`,
+        start: "top+=35% top",
         end: "bottom bottom",
         markers: true,
         onEnter: () => animateHeaderElements(true),
@@ -91,3 +90,25 @@ function animateHeaderElements(show) {
         ease: "power2.inOut" // Smooth easing for header animation
     });
 }
+
+// Add this function to handle format changes
+const changeFormat = (format) => {
+    currentFormat = format;
+    preloadImages();
+    // Reset animation or update current frame
+    updateFrame(Math.floor(sequenceTl.progress() * totalFrames));
+};
+
+function updateFrame(frameIndex) {
+    sequenceImg.src = getImagePath(frameIndex);
+    frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
+    console.log("Frame:", frameIndex + 1);
+}
+
+// Add event listener for format selector
+document.getElementById('image-format').addEventListener('change', (e) => {
+    changeFormat(e.target.value);
+});
+
+// Initial preload
+preloadImages();

@@ -93,3 +93,13 @@ nav ul li {
 nav ul li:last-child {
     margin-bottom: 0; /* Remove margin from the last item */
 }
+
+#format-selector {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+}
