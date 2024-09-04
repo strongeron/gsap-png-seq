@@ -96,7 +96,9 @@ const changeFormat = (format) => {
     currentFormat = format;
     preloadImages();
     // Reset animation or update current frame
-    updateFrame(Math.floor(sequenceTl.progress() * totalFrames));
+    const progress = sequenceTl.progress();
+    const frameIndex = Math.floor(progress * totalFrames);
+    updateFrame(frameIndex);
 };
 
 function updateFrame(frameIndex) {
