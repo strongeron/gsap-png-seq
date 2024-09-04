@@ -2,12 +2,12 @@ console.log("Script started");
 
 gsap.registerPlugin(ScrollTrigger);
 
-const totalFrames = 120;
-const triggerFrame = 35;
-const fps = 120; // Frames per second from Blender export
+const totalFrames = 30; // Updated to 30 frames
+const triggerFrame = 10; // Adjusted for 30 frames, you can fine-tune this
+const fps = 30; // Adjusted for 30 frames
 const duration = totalFrames / fps; // Duration of the animation in seconds
 const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
-const imageExtension = '.png';
+const imageExtension = '.webp'; // Changed to .webp
 
 const imagePaths = Array.from({ length: totalFrames }, (_, i) => 
     `${imagePrefix}${(i + 1).toString().padStart(4, '0')}${imageExtension}`
