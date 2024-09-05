@@ -4,7 +4,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const totalFrames = 31; // 0000 to 0030
 const imagePrefix = 'https://strongeron.github.io/gsap-png-seq/images/';
-let currentFormat = 'webp-combined';
+let currentFormat = 'dynamic';
 let frameQuality = [];
 
 const getImagePath = (frameIndex) => {
@@ -14,10 +14,10 @@ const getImagePath = (frameIndex) => {
             return `${imagePrefix}png/${paddedIndex}.png`;
         case 'webp':
             return `${imagePrefix}webp/${paddedIndex}.webp`;
-        case 'webp-combined':
+        case 'dynamic':
             return frameQuality[frameIndex] || `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         default:
-            return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`; 
+            return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
     }
 };
 
@@ -25,28 +25,45 @@ const determineFrameQualities = async () => {
     frameQuality = [];
     for (let i = 0; i < totalFrames; i++) {
         const paddedIndex = i.toString().padStart(4, '0');
-        const highQualityPath = `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
-        const lowQualityPath = `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
+        const highPngPath = `${imagePrefix}webp-combined/high/${paddedIndex}.png`;
+        const webpPath = `${imagePrefix}webp/${paddedIndex}.webp`;
+        const lowWebpPath = `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         
+        console.log(`Checking high PNG for frame ${i}: ${highPngPath}`);
         try {
-            const highResponse = await fetch(highQualityPath, { method: 'HEAD' });
-            if (highResponse.ok) {
-                frameQuality[i] = highQualityPath;
+            const highPngResponse = await fetch(highPngPath, { method: 'HEAD' });
+            if (highPngResponse.ok) {
+                console.log(`High PNG found for frame ${i}`);
+                frameQuality[i] = highPngPath;
                 continue;
             }
         } catch (error) {
-            console.log(`High quality frame ${i} not found, checking low quality`);
+            console.log(`High PNG frame ${i} not found, checking WebP`);
         }
         
+        console.log(`Checking WebP for frame ${i}: ${webpPath}`);
         try {
-            const lowResponse = await fetch(lowQualityPath, { method: 'HEAD' });
-            if (lowResponse.ok) {
-                frameQuality[i] = lowQualityPath;
-            } else {
-                console.log(`Frame ${i} not found in either quality`);
+            const webpResponse = await fetch(webpPath, { method: 'HEAD' });
+            if (webpResponse.ok) {
+                console.log(`WebP found for frame ${i}`);
+                frameQuality[i] = webpPath;
+                continue;
             }
         } catch (error) {
-            console.log(`Frame ${i} not found in either quality`);
+            console.log(`WebP frame ${i} not found, checking low WebP`);
+        }
+
+        console.log(`Checking low WebP for frame ${i}: ${lowWebpPath}`);
+        try {
+            const lowWebpResponse = await fetch(lowWebpPath, { method: 'HEAD' });
+            if (lowWebpResponse.ok) {
+                console.log(`Low WebP found for frame ${i}`);
+                frameQuality[i] = lowWebpPath;
+            } else {
+                console.log(`Frame ${i} not found in any format`);
+            }
+        } catch (error) {
+            console.log(`Frame ${i} not found in any format`);
         }
     }
     console.log("Frame qualities:", frameQuality);
