@@ -17,7 +17,7 @@ const getImagePath = (frameIndex) => {
         case 'webp-combined':
             return frameQuality[frameIndex] || `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         default:
-            return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
+            return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`; 
     }
 };
 
