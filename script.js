@@ -15,8 +15,7 @@ const getImagePath = (frameIndex) => {
         case 'webp':
             return `${imagePrefix}webp/${paddedIndex}.webp`;
         case 'webp-combined':
-            const quality = frameQuality[frameIndex] || 'low';
-            return `${imagePrefix}webp-combined/${quality}/${paddedIndex}.webp`;
+            return frameQuality[frameIndex] || `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         default:
             return `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
     }
@@ -32,7 +31,7 @@ const determineFrameQualities = async () => {
         try {
             const highResponse = await fetch(highQualityPath, { method: 'HEAD' });
             if (highResponse.ok) {
-                frameQuality[i] = 'high';
+                frameQuality[i] = highQualityPath;
                 continue;
             }
         } catch (error) {
@@ -42,7 +41,7 @@ const determineFrameQualities = async () => {
         try {
             const lowResponse = await fetch(lowQualityPath, { method: 'HEAD' });
             if (lowResponse.ok) {
-                frameQuality[i] = 'low';
+                frameQuality[i] = lowQualityPath;
             } else {
                 console.log(`Frame ${i} not found in either quality`);
             }
