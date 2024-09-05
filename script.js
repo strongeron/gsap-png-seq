@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         scrollTrigger: {
             trigger: ".scroll-container",
             start: "top top",
-            end: "bottom bottom",
+            end: "bottom bottom", 
             scrub: 0.5,
             markers: true,
         }
