@@ -26,6 +26,7 @@ const determineFrameQualities = async () => {
     for (let i = 0; i < totalFrames; i++) {
         const paddedIndex = i.toString().padStart(4, '0');
         const highPngPath = `${imagePrefix}webp-combined/high/${paddedIndex}.png`;
+        const highWebpPath = `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
         const webpPath = `${imagePrefix}webp/${paddedIndex}.webp`;
         const lowWebpPath = `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         
@@ -38,7 +39,19 @@ const determineFrameQualities = async () => {
                 continue;
             }
         } catch (error) {
-            console.log(`High PNG frame ${i} not found, checking WebP`);
+            console.log(`High PNG frame ${i} not found, checking high WebP`);
+        }
+        
+        console.log(`Checking high WebP for frame ${i}: ${highWebpPath}`);
+        try {
+            const highWebpResponse = await fetch(highWebpPath, { method: 'HEAD' });
+            if (highWebpResponse.ok) {
+                console.log(`High WebP found for frame ${i}`);
+                frameQuality[i] = highWebpPath;
+                continue;
+            }
+        } catch (error) {
+            console.log(`High WebP frame ${i} not found, checking regular WebP`);
         }
         
         console.log(`Checking WebP for frame ${i}: ${webpPath}`);
