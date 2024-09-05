@@ -26,8 +26,6 @@ const determineFrameQualities = async () => {
     for (let i = 0; i < totalFrames; i++) {
         const paddedIndex = i.toString().padStart(4, '0');
         const highPngPath = `${imagePrefix}webp-combined/high/${paddedIndex}.png`;
-        const highWebpPath = `${imagePrefix}webp-combined/high/${paddedIndex}.webp`;
-        const webpPath = `${imagePrefix}webp/${paddedIndex}.webp`;
         const lowWebpPath = `${imagePrefix}webp-combined/low/${paddedIndex}.webp`;
         
         console.log(`Checking high PNG for frame ${i}: ${highPngPath}`);
@@ -39,45 +37,11 @@ const determineFrameQualities = async () => {
                 continue;
             }
         } catch (error) {
-            console.log(`High PNG frame ${i} not found, checking high WebP`);
+            console.log(`High PNG frame ${i} not found, using low WebP`);
         }
         
-        console.log(`Checking high WebP for frame ${i}: ${highWebpPath}`);
-        try {
-            const highWebpResponse = await fetch(highWebpPath, { method: 'HEAD' });
-            if (highWebpResponse.ok) {
-                console.log(`High WebP found for frame ${i}`);
-                frameQuality[i] = highWebpPath;
-                continue;
-            }
-        } catch (error) {
-            console.log(`High WebP frame ${i} not found, checking regular WebP`);
-        }
-        
-        console.log(`Checking WebP for frame ${i}: ${webpPath}`);
-        try {
-            const webpResponse = await fetch(webpPath, { method: 'HEAD' });
-            if (webpResponse.ok) {
-                console.log(`WebP found for frame ${i}`);
-                frameQuality[i] = webpPath;
-                continue;
-            }
-        } catch (error) {
-            console.log(`WebP frame ${i} not found, checking low WebP`);
-        }
-
-        console.log(`Checking low WebP for frame ${i}: ${lowWebpPath}`);
-        try {
-            const lowWebpResponse = await fetch(lowWebpPath, { method: 'HEAD' });
-            if (lowWebpResponse.ok) {
-                console.log(`Low WebP found for frame ${i}`);
-                frameQuality[i] = lowWebpPath;
-            } else {
-                console.log(`Frame ${i} not found in any format`);
-            }
-        } catch (error) {
-            console.log(`Frame ${i} not found in any format`);
-        }
+        console.log(`Using low WebP for frame ${i}: ${lowWebpPath}`);
+        frameQuality[i] = lowWebpPath;
     }
     console.log("Frame qualities:", frameQuality);
 };
@@ -85,11 +49,9 @@ const determineFrameQualities = async () => {
 const preloadImages = () => {
     console.log("Preloading images for format:", currentFormat);
     for (let i = 0; i < totalFrames; i++) {
-        if (frameQuality[i]) {
-            const img = new Image();
-            img.src = getImagePath(i);
-            console.log("Preloading:", img.src);
-        }
+        const img = new Image();
+        img.src = getImagePath(i);
+        console.log("Preloading:", img.src);
     }
 };
 
@@ -106,30 +68,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     await determineFrameQualities();
 
     function updateFrame(frameIndex) {
-        if (frameQuality[frameIndex]) {
-            const imagePath = getImagePath(frameIndex);
-            console.log("Updating frame:", frameIndex, "Image path:", imagePath);
-            sequenceImg.src = imagePath;
-            frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
-        } else {
-            console.log("Frame not available:", frameIndex);
-        }
+        const imagePath = getImagePath(frameIndex);
+        console.log("Updating frame:", frameIndex, "Image path:", imagePath);
+        sequenceImg.src = imagePath;
+        frameCounter.textContent = `Frame: ${frameIndex + 1} / ${totalFrames}`;
     }
 
     function changeFormat(format) {
         console.log("Changing format to:", format);
         currentFormat = format;
-        preloadImages();
-        const progress = sequenceTl.progress();
-        const frameIndex = Math.floor(progress * (totalFrames - 1));
-        updateFrame(frameIndex);
+        if (format === 'dynamic') {
+            determineFrameQualities().then(() => {
+                preloadImages();
+                const progress = sequenceTl.progress();
+                const frameIndex = Math.floor(progress * (totalFrames - 1));
+                updateFrame(frameIndex);
+            });
+        } else {
+            preloadImages();
+            const progress = sequenceTl.progress();
+            const frameIndex = Math.floor(progress * (totalFrames - 1));
+            updateFrame(frameIndex);
+        }
     }
 
     const sequenceTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".scroll-container",
             start: "top top",
-            end: "bottom bottom", 
+            end: "bottom bottom",
             scrub: 0.5,
             markers: true,
         }
